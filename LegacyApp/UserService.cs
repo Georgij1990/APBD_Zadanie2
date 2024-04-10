@@ -29,13 +29,13 @@ namespace LegacyApp
         public bool AddUser(string firstName, string lastName, string email, DateTime dateOfBirth, int clientId)
         {
             // Logika biznesowa - walidacja
-            _userValidator.ValidateUserName(firstName, lastName);
+            if (!_userValidator.ValidateUserName(firstName, lastName)) return false;
 
             // Logika biznesowa - walidacja
-            _userValidator.ValidateEmail(email);
+            if (!_userValidator.ValidateEmail(email)) return false;
 
             // Logika biznesowa
-            _userValidator.ValidateAge(dateOfBirth);
+            if(!_userValidator.ValidateAge(dateOfBirth)) return false;
 
             // Infrastruktura
             var client = _clientRepository.GetById(clientId);
@@ -53,7 +53,7 @@ namespace LegacyApp
             _userValidator.CheckType(user, client, _creditService);
 
             // Logika biznesowa
-            _userValidator.ValidateLimits(user);
+            if (!_userValidator.ValidateLimits(user)) return false;
 
             //Infrastruktura
             UserDataAccess.AddUser(user);
