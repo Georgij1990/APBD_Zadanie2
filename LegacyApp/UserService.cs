@@ -2,7 +2,7 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Security.AccessControl;
-using LegacyApp.Validator;
+using LegacyApp.Validators;
 
 namespace LegacyApp
 {
@@ -50,29 +50,10 @@ namespace LegacyApp
             };
 
             // Logika biznesowa + Infrastruktura
-            if (client.Type == "VeryImportantClient")
-            {
-                user.HasCreditLimit = false;
-            }
-            else if (client.Type == "ImportantClient")
-            {
-                int creditLimit = _creditService.GetCreditLimit(user.LastName, user.DateOfBirth);
-                creditLimit = creditLimit * 2;
-                user.CreditLimit = creditLimit;
-
-            }
-            else
-            {
-                user.HasCreditLimit = true;
-                int creditLimit = _creditService.GetCreditLimit(user.LastName, user.DateOfBirth);
-                user.CreditLimit = creditLimit;
-            }
+            _userValidator.CheckType(user, client, _creditService);
 
             // Logika biznesowa
-            if (user.HasCreditLimit && user.CreditLimit < 500)
-            {
-                return false;
-            }
+            _userValidator.ValidateLimits(user);
 
             //Infrastruktura
             UserDataAccess.AddUser(user);
